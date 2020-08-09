@@ -7,26 +7,29 @@ class DropBoxController{
         this.progressBarEl = this.snackModalEl.querySelector('.mc-progress-bar-fg');
         this.nameFileEl = this.snackModalEl.querySelector('.filename');
         this.timeLeftEl = this.snackModalEl.querySelector('.timeleft');
+        this.listFilesEl = document.querySelector('#list-of-files-and-directories');
 
-        this.connectFirebase(); 
-
+        this.connectFirebase();
         this.initEvents();
-
+        this.readFiles();
     }
 
     connectFirebase(){
-        var firebaseConfig = {
-            apiKey: "AIzaSyAVhcstBVoEBOLrT2Le0k5i7Cxuou7X06Q",
-            authDomain: "dropbox-clone-clone.firebaseapp.com",
-            databaseURL: "https://dropbox-clone-clone.firebaseio.com",
-            projectId: "dropbox-clone-clone",
-            storageBucket: "dropbox-clone-clone.appspot.com",
-            messagingSenderId: "849109314541",
-            appId: "1:849109314541:web:bc3f7f30852ab82368d5e4",
-            measurementId: "G-783JE5RBXF"
-          };
-          // Initialize Firebase
-          firebase.initializeApp(firebaseConfig);
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBb1-lSltA4WhS6teCYHCkn-ajWCXOQY_E",
+            authDomain: "dropbox-clone-b6b2f.firebaseapp.com",
+            databaseURL: "https://dropbox-clone-b6b2f.firebaseio.com",
+            projectId: "dropbox-clone-b6b2f",
+            storageBucket: "dropbox-clone-b6b2f.appspot.com",
+            messagingSenderId: "402169189499",
+            appId: "1:402169189499:web:971ab79b77ae96318bfede",
+            measurementId: "G-JJ738CDJFX"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+
     }
 
     initEvents(){
@@ -39,21 +42,33 @@ class DropBoxController{
 
         this.inputFilesEl.addEventListener('change', event => {
 
+            this.btnSendFileEl.disabled = true;
+
             this.uploadTask(event.target.files).then(responses => {
                 responses.forEach(resp => {
 
                     console.log(resp.files['input-file']);
 
-                    this.getFirebaseRef().push().set(resp.files['input-file'])
+                    this.getFirebaseRef().push().set(resp.files['input-file']);
 
                 });
+
+                this.uploadComplete();
             });
 
             this.modalShow();
 
-            this.inputFilesEl.value = '';
-
         });
+
+    }
+
+    uploadComplete(){
+
+        this.modalShow(false);
+
+        this.inputFilesEl.value = '';
+
+        this.btnSendFileEl.disabled = false;
 
     }
 
@@ -84,7 +99,7 @@ class DropBoxController{
 
                     ajax.onload = event => {
 
-                        this.modalShow(false);
+                        
 
                         try{
 
@@ -182,6 +197,7 @@ class DropBoxController{
 
             case 'audio/mp3':
             case 'audio/ogg':
+            case 'audio/mpeg':
                 return `
                 <svg width="160" height="160" viewBox="0 0 160 160" class="mc-icon-template-content tile__preview tile__preview--icon">
                     <title>content-audio-large</title>
@@ -207,6 +223,7 @@ class DropBoxController{
             case 'image/jpg':
             case 'image/png':
             case 'image/gif':
+            case 'image/svg+xml':
                 return`
                  <svg version="1.1" id="Camada_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="160px" height="160px" viewBox="0 0 160 160" enable-background="new 0 0 160 160" xml:space="preserve">
                     <filter height="102%" width="101.4%" id="mc-content-unknown-large-a" filterUnits="objectBoundingBox" y="-.5%" x="-.7%">
@@ -249,7 +266,65 @@ class DropBoxController{
                 `
                 break;
 
-
+            case 'application/pdf':
+                return `
+                <svg version="1.1" id="Camada_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                width="160px" height="160px" viewBox="0 0 160 160" enable-background="new 0 0 160 160" xml:space="preserve">
+                    <filter height="102%" width="101.4%" id="mc-content-unknown-large-a" filterUnits="objectBoundingBox" y="-.5%" x="-.7%">
+                        <feOffset result="shadowOffsetOuter1" in="SourceAlpha" dy="1"></feOffset>
+                        <feColorMatrix values="0 0 0 0 0.858823529 0 0 0 0 0.870588235 0 0 0 0 0.88627451 0 0 0 1 0" in="shadowOffsetOuter1">
+                        </feColorMatrix>
+                    </filter>
+                    <title>PDF</title>
+                    <g>
+                        <g>
+                            <g filter="url(#mc-content-unknown-large-a)">
+                                <path id="mc-content-unknown-large-b_2_" d="M47,30h66c2.209,0,4,1.791,4,4v92c0,2.209-1.791,4-4,4H47c-2.209,0-4-1.791-4-4V34
+                                        C43,31.791,44.791,30,47,30z" />
+                            </g>
+                            <g>
+                                <path id="mc-content-unknown-large-b_1_" fill="#F7F9FA" d="M47,30h66c2.209,0,4,1.791,4,4v92c0,2.209-1.791,4-4,4H47
+                                        c-2.209,0-4-1.791-4-4V34C43,31.791,44.791,30,47,30z" />
+                            </g>
+                        </g>
+                    </g>
+                    <path fill-rule="evenodd" clip-rule="evenodd" fill="#F15124" d="M102.482,91.479c-0.733-3.055-3.12-4.025-5.954-4.437
+                            c-2.08-0.302-4.735,1.019-6.154-0.883c-2.167-2.905-4.015-6.144-5.428-9.482c-1.017-2.402,1.516-4.188,2.394-6.263
+                            c1.943-4.595,0.738-7.984-3.519-9.021c-2.597-0.632-5.045-0.13-6.849,1.918c-2.266,2.574-1.215,5.258,0.095,7.878
+                            c3.563,7.127-1.046,15.324-8.885,15.826c-3.794,0.243-6.93,1.297-7.183,5.84c0.494,3.255,1.988,5.797,5.14,6.825
+                            c3.062,1,4.941-0.976,6.664-3.186c1.391-1.782,1.572-4.905,4.104-5.291c3.25-0.497,6.677-0.464,9.942-0.025
+                            c2.361,0.318,2.556,3.209,3.774,4.9c2.97,4.122,6.014,5.029,9.126,2.415C101.895,96.694,103.179,94.38,102.482,91.479z
+                            M67.667,94.885c-1.16-0.312-1.621-0.97-1.607-1.861c0.018-1.199,1.032-1.121,1.805-1.132c0.557-0.008,1.486-0.198,1.4,0.827
+                            C69.173,93.804,68.363,94.401,67.667,94.885z M82.146,65.949c1.331,0.02,1.774,0.715,1.234,1.944
+                            c-0.319,0.725-0.457,1.663-1.577,1.651c-1.03-0.498-1.314-1.528-1.409-2.456C80.276,65.923,81.341,65.938,82.146,65.949z
+                            M81.955,86.183c-0.912,0.01-2.209,0.098-1.733-1.421c0.264-0.841,0.955-2.04,1.622-2.162c1.411-0.259,1.409,1.421,2.049,2.186
+                            C84.057,86.456,82.837,86.174,81.955,86.183z M96.229,94.8c-1.14-0.082-1.692-1.111-1.785-2.033
+                            c-0.131-1.296,1.072-0.867,1.753-0.876c0.796-0.011,1.668,0.118,1.588,1.293C97.394,93.857,97.226,94.871,96.229,94.8z"
+                    />
+                </svg>
+                `;
+            case 'video/mp4':
+                return `
+                <svg width="160" height="160" viewBox="0 0 160 160" class="mc-icon-template-content tile__preview tile__preview--icon">
+                    <title>content-video-large</title>
+                    <defs>
+                        <rect id="mc-content-video-large-b" x="30" y="43" width="100" height="74" rx="4"></rect>
+                        <filter x="-.5%" y="-.7%" width="101%" height="102.7%" filterUnits="objectBoundingBox" id="mc-content-video-large-a">
+                            <feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+                            <feColorMatrix values="0 0 0 0 0.858823529 0 0 0 0 0.870588235 0 0 0 0 0.88627451 0 0 0 1 0" in="shadowOffsetOuter1"></feColorMatrix>
+                        </filter>
+                    </defs>
+                    <g fill="none" fill-rule="evenodd">
+                        <g>
+                            <use fill="#000" filter="url(#mc-content-video-large-a)" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#mc-content-video-large-b"></use>
+                            <use fill="#F7F9FA" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#mc-content-video-large-b"></use>
+                        </g>
+                        <path d="M69 67.991c0-1.1.808-1.587 1.794-1.094l24.412 12.206c.99.495.986 1.3 0 1.794L70.794 93.103c-.99.495-1.794-.003-1.794-1.094V67.99z"
+                            fill="#637282"></path>
+                    </g>
+                </svg>
+                `;
+            break
             default: 
 
                 return `
@@ -276,14 +351,97 @@ class DropBoxController{
 
     }
 
-    getFileView(file){
+    getFileView(file, key){
 
-        return `
-        <li>
+        let li = document.createElement('li');
+
+        li.dataset.key = key;
+
+        li.innerHTML = `
             ${this.getFileIconView(file)}
-            <div class="name text-center">Meus Documentos</div>
-        </li>
+            <div class="name text-center">${file.name}</div>
         `;
+        this.initEventsLi(li);
+
+        return li;
+
+    }
+
+    readFiles(){
+
+        this.getFirebaseRef().on('value', snapshot => {
+
+            this.listFilesEl.innerHTML = '';
+
+            snapshot.forEach(snapItem => {
+
+                const key = snapItem.key;
+                const data = snapItem.val();
+
+                console.log(key, data);
+
+                this.listFilesEl.appendChild(this.getFileView(data, key));
+
+            });
+
+        });
+
+    }
+
+    initEventsLi(li){
+
+        li.addEventListener('click', e => {
+
+            if(e.shiftKey){
+
+                let firstLi = this.listFilesEl.querySelector('.selected');
+
+                console.log(firstLi);
+
+                if(firstLi){
+
+                    let indexStart;
+                    let indexEnd;
+                    let lis = li.parentElement.childNodes;
+
+                    lis.forEach((el, index) => {
+                        
+                        if(firstLi === el) indexStart = index;
+                        if(li === el) indexEnd = index;
+
+                    });
+
+                    let index = [indexStart, indexEnd].sort();
+
+                    lis.forEach((el, i) => {
+                        
+                        if(i >= index[0] && i <= index[1]){
+
+                            el.classList.add('selected');
+
+                        }
+
+                    });
+
+                    return true;
+
+                }
+
+            }
+
+            if(!e.ctrlKey){
+
+                this.listFilesEl.querySelectorAll('li').forEach(el => {
+
+                    el.classList.remove('selected');
+
+                });
+
+            }
+
+            li.classList.toggle('selected');
+
+        });
 
     }
 
